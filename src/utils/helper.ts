@@ -1,9 +1,12 @@
 import { execSync } from "child_process";
+import fs from "fs";
 
 type CronJob = {
   Cron: string; 
   Job: string;  
 };
+
+const TEMP_FILE = "/var/tmp/cronweb.txt";
 
 export function shellGetCrontab(): CronJob[] {
   let out = "";
@@ -37,19 +40,24 @@ export function shellGetCrontab(): CronJob[] {
 
 
 export function shellWriteAllCronjobs(jobs: CronJob[]) {
+
+    if(!fs.existsSync(TEMP_FILE)){
+        fs.writeFileSync(TEMP_FILE, "");
+    }
     let text = "";
     for (const job of jobs) {
       text += `${job.Cron} ${job.Job}\n`;
     }
-    execSync("crontab -", { input: text });
+   fs.writeFileSync(TEMP_FILE, text);
+   execSync(`crontab ${TEMP_FILE}`);
   }
   
   /**
    * Adds one job to the existing crontab.
    */
   export function shellAddCronJob(job: CronJob) {
-    const existing = shellGetCrontab();
-    existing.push(job);
-    shellWriteAllCronjobs(existing);
+    const current_jobs = shellGetCrontab();
+    current_jobs.push(job);
+    shellWriteAllCronjobs(current_jobs);
   }
   
