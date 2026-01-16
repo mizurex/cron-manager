@@ -1,0 +1,8 @@
+[
+    {
+        "id": "1",
+        "name": "Job 1",
+        "command": "/home/mizurex/teest.sh",
+        "schedule": "* * * * *"
+    }
+]
